@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BRorNot2BR</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#app">Zum Inhalt springen</a>
+    <div class="page">
+      <header class="hero">
+        <div class="hero__content">
+          <p class="hero__eyebrow">BR or not 2 BR?</p>
+          <h1>BRorNot2BR</h1>
+          <p class="hero__subtitle">
+            Eine humorvolle, aber fundierte Entscheidungshilfe rund um die
+            Teilnahme an der Betriebsratswahl.
+          </p>
+        </div>
+      </header>
+
+      <main id="app" class="app" aria-live="polite">
+        <section id="start-screen" class="card" aria-labelledby="start-title">
+          <h2 id="start-title">Bereit für den Wahl-Check?</h2>
+          <p>
+            Du musst nicht Fan sein, um wählen zu gehen. Es reicht, wenn dir
+            dein Arbeitsalltag nicht egal ist. Wählen dauert meistens kürzer als
+            die Kaffeeschlange.
+          </p>
+          <div class="button-row">
+            <button id="start-btn" class="btn btn--primary" aria-label="Wahl-Check starten">
+              Start
+            </button>
+            <button id="why-btn" class="btn btn--ghost" aria-label="Warum wählen?">
+              Warum wählen?
+            </button>
+            <button id="disclaimer-btn" class="btn btn--ghost" aria-label="Disclaimer und Datenschutz anzeigen">
+              Disclaimer &amp; Datenschutz
+            </button>
+          </div>
+        </section>
+
+        <section id="question-screen" class="card hidden" aria-labelledby="question-title">
+          <div class="progress" aria-hidden="true">
+            <div id="progress-bar" class="progress__bar"></div>
+          </div>
+          <p id="progress-text" class="progress__text">Frage 1 von 12</p>
+          <h2 id="question-title">Frage</h2>
+          <p id="question-text" class="question__text"></p>
+          <div class="scale" role="group" aria-label="Antwortskala">
+            <button class="scale__btn" data-value="1">Stimme gar nicht zu</button>
+            <button class="scale__btn" data-value="2">Stimme eher nicht zu</button>
+            <button class="scale__btn" data-value="3">Teils/teils</button>
+            <button class="scale__btn" data-value="4">Stimme eher zu</button>
+            <button class="scale__btn" data-value="5">Stimme voll zu</button>
+          </div>
+          <div class="button-row button-row--space">
+            <button id="back-btn" class="btn btn--ghost" aria-label="Zur vorherigen Frage">
+              Zurück
+            </button>
+            <button id="reset-btn" class="btn btn--ghost" aria-label="Wahl-Check neu starten">
+              Reset
+            </button>
+          </div>
+        </section>
+
+        <section id="result-screen" class="card hidden" aria-labelledby="result-title">
+          <h2 id="result-title">Dein Ergebnis</h2>
+          <p class="result__score">
+            Wie wahrscheinlich ist es, dass du wählen gehst?
+            <span id="score-value">0</span>%
+          </p>
+          <div id="result-text" class="result__text"></div>
+          <div class="result__grid">
+            <div>
+              <h3>Top-Faktoren</h3>
+              <ul id="top-factors" class="list"></ul>
+            </div>
+            <div>
+              <h3>Nächste Schritte</h3>
+              <ul id="next-steps" class="list"></ul>
+            </div>
+          </div>
+          <div class="continuity">
+            <h3>Warum Kontinuität oft hilft</h3>
+            <p>
+              Erfahrung kann Prozesse beschleunigen, laufende Themen brauchen
+              nicht jedes Mal bei Null zu starten, und eine eingespielte
+              Zusammenarbeit sorgt oft für Verlässlichkeit. Das ist kein Befehl,
+              sondern ein Denkanstoß.
+            </p>
+          </div>
+          <div class="button-row">
+            <button id="restart-btn" class="btn btn--primary" aria-label="Wahl-Check erneut starten">
+              Nochmal checken
+            </button>
+            <button id="share-btn" class="btn btn--ghost" aria-label="Hinweis kopieren">
+              Hinweis kopieren
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal__content" role="document">
+        <div class="modal__header">
+          <h2 id="modal-title"></h2>
+          <button id="modal-close" class="btn btn--ghost" aria-label="Modal schließen">
+            Schließen
+          </button>
+        </div>
+        <div id="modal-body" class="modal__body"></div>
+      </div>
+    </div>
+
+    <script src="assets/questions.js"></script>
+    <script src="assets/results.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
