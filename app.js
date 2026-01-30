@@ -40,7 +40,7 @@ const openSection = (section) => {
 };
 
 const normalizeAnswer = (value, reverse) => {
-  const normalized = value - 3;
+  const normalized = value - 2;
   return reverse ? -normalized : normalized;
 };
 
@@ -58,14 +58,14 @@ const calcScore = () => {
     const value = normalizeAnswer(answer, question.reverseScoring);
     const weighted = value * question.weight;
     total += weighted;
-    totalMax += 2 * question.weight;
+    totalMax += 1 * question.weight;
 
     if (!categoryTotals[question.category]) {
       categoryTotals[question.category] = 0;
       categoryMax[question.category] = 0;
     }
     categoryTotals[question.category] += weighted;
-    categoryMax[question.category] += 2 * question.weight;
+    categoryMax[question.category] += 1 * question.weight;
   });
 
   const score = Math.round(((total + totalMax) / (2 * totalMax)) * 100);
@@ -156,11 +156,15 @@ const showModal = (title, bodyHtml) => {
   modalTitle.textContent = title;
   modalBody.innerHTML = bodyHtml;
   modal.classList.remove("hidden");
+  modal.removeAttribute("hidden");
+  modal.setAttribute("aria-hidden", "false");
   trapFocus(modal);
 };
 
 const hideModal = () => {
   modal.classList.add("hidden");
+  modal.setAttribute("hidden", "");
+  modal.setAttribute("aria-hidden", "true");
   releaseFocusTrap();
   if (state.lastFocus) {
     state.lastFocus.focus();
@@ -316,4 +320,5 @@ modal.addEventListener("click", (event) => {
   }
 });
 
+hideModal();
 renderQuestion();

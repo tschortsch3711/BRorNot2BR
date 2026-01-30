@@ -94,7 +94,7 @@ a {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .button-row {
@@ -227,6 +227,10 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+}
+
+.modal[hidden] {
+  display: none !important;
 }
 
 .modal__content {

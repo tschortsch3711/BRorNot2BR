@@ -49,11 +49,9 @@
           <h2 id="question-title">Frage</h2>
           <p id="question-text" class="question__text"></p>
           <div class="scale" role="group" aria-label="Antwortskala">
-            <button class="scale__btn" data-value="1">Stimme gar nicht zu</button>
-            <button class="scale__btn" data-value="2">Stimme eher nicht zu</button>
-            <button class="scale__btn" data-value="3">Teils/teils</button>
-            <button class="scale__btn" data-value="4">Stimme eher zu</button>
-            <button class="scale__btn" data-value="5">Stimme voll zu</button>
+            <button class="scale__btn" data-value="1">Nein</button>
+            <button class="scale__btn" data-value="2">Vielleicht</button>
+            <button class="scale__btn" data-value="3">Ja</button>
           </div>
           <div class="button-row button-row--space">
             <button id="back-btn" class="btn btn--ghost" aria-label="Zur vorherigen Frage">
@@ -103,7 +101,15 @@
       </main>
     </div>
 
-    <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div
+      id="modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      hidden
+      aria-hidden="true"
+    >
       <div class="modal__content" role="document">
         <div class="modal__header">
           <h2 id="modal-title"></h2>
