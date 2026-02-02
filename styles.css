@@ -187,6 +187,26 @@ button:focus-visible {
   border-color: var(--accent);
 }
 
+.comeback {
+  margin-top: 0.8rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: rgba(125, 211, 252, 0.12);
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  color: var(--muted);
+}
+
+.result__headline {
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
+}
+
+.result__trend {
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  color: var(--muted);
+}
+
 .result__score {
   font-size: 1.2rem;
   margin-bottom: 1rem;
@@ -199,11 +219,32 @@ button:focus-visible {
   margin-left: 0.4rem;
 }
 
+.factor-title {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.factor-hint {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted);
+}
+
 .result__grid {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   margin-top: 1.5rem;
+}
+
+.result__block {
+  margin-top: 1.2rem;
+}
+
+.result__block h4 {
+  margin-bottom: 0.4rem;
+  color: var(--text);
 }
 
 .list {
@@ -298,4 +339,23 @@ button:focus-visible {
     scroll-behavior: auto;
     transition: none !important;
   }
+}
+
+/* -- Antwort-Auswahl: dauerhaftes Hervorheben -- */
+.answer-option {
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.answer-option:hover,
+.answer-option:focus {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.answer-option.selected {
+  background-color: rgba(30, 120, 30, 0.1);
+  border: 2px solid rgba(30, 120, 30, 0.25);
+  box-shadow: 0 4px 10px rgba(30, 120, 30, 0.05);
+}
+.answer-option:focus {
+  outline: 3px solid rgba(0, 0, 128, 0.12);
+  outline-offset: 2px;
 }
