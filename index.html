@@ -48,11 +48,8 @@
           <p id="progress-text" class="progress__text">Frage 1 von 12</p>
           <h2 id="question-title">Frage</h2>
           <p id="question-text" class="question__text"></p>
-          <div class="scale" role="group" aria-label="Antwortskala">
-            <button class="scale__btn" data-value="1">Nein</button>
-            <button class="scale__btn" data-value="2">Vielleicht</button>
-            <button class="scale__btn" data-value="3">Ja</button>
-          </div>
+          <div id="answer-options" class="scale" role="group" aria-label="Antwortmöglichkeiten"></div>
+          <div id="answer-comeback" class="comeback hidden" aria-live="polite"></div>
           <div class="button-row button-row--space">
             <button id="back-btn" class="btn btn--ghost" aria-label="Zur vorherigen Frage">
               Zurück
@@ -65,10 +62,8 @@
 
         <section id="result-screen" class="card hidden" aria-labelledby="result-title">
           <h2 id="result-title">Dein Ergebnis</h2>
-          <p class="result__score">
-            Wie wahrscheinlich ist es, dass du wählen gehst?
-            <span id="score-value">0</span>%
-          </p>
+          <p class="result__headline">Dein Check: <strong>Geh wählen.</strong></p>
+          <p class="result__trend">Stimmungstrend: <span id="score-value">0</span>/100</p>
           <div id="result-text" class="result__text"></div>
           <div class="result__grid">
             <div>
