@@ -4,8 +4,6 @@ const state = {
   lastFocus: null,
 };
 
-let advanceTimeout = null;
-let comebackTimeout = null;
 
 const startScreen = document.getElementById("start-screen");
 const questionScreen = document.getElementById("question-screen");
@@ -30,11 +28,13 @@ const startBtn = document.getElementById("start-btn");
 const whyBtn = document.getElementById("why-btn");
 const disclaimerBtn = document.getElementById("disclaimer-btn");
 const backBtn = document.getElementById("back-btn");
+const nextBtn = document.getElementById("next-btn");
 const resetBtn = document.getElementById("reset-btn");
 const restartBtn = document.getElementById("restart-btn");
 const shareBtn = document.getElementById("share-btn");
 
 const totalQuestions = QUESTIONS.length;
+let pendingAdvance = null;
 
 const openSection = (section) => {
   [startScreen, questionScreen, resultScreen].forEach((screen) => {
@@ -96,29 +96,23 @@ const buildTopFactors = (tagTotals, tagMax) => {
 };
 
 const clearComeback = () => {
-  if (comebackTimeout) {
-    clearTimeout(comebackTimeout);
-  }
   answerComebackEl.textContent = "";
   answerComebackEl.classList.add("hidden");
+  nextBtn.disabled = true;
+  pendingAdvance = null;
 };
 
 const showComeback = (text) => {
   clearComeback();
   answerComebackEl.textContent = text;
   answerComebackEl.classList.remove("hidden");
-  comebackTimeout = setTimeout(() => {
-    answerComebackEl.classList.add("hidden");
-  }, 2000);
+  nextBtn.disabled = false;
 };
 
 const renderQuestion = () => {
   const question = QUESTIONS[state.currentIndex];
   if (!question) {
     return;
-  }
-  if (advanceTimeout) {
-    clearTimeout(advanceTimeout);
   }
   clearComeback();
   questionTitle.textContent = `Frage ${state.currentIndex + 1}`;
@@ -143,7 +137,7 @@ const handleAnswer = (option) => {
   state.answers[question.id] = option;
   showComeback(option.comeback);
 
-  const nextStep = () => {
+  pendingAdvance = () => {
     if (state.currentIndex < totalQuestions - 1) {
       state.currentIndex += 1;
       renderQuestion();
@@ -151,11 +145,6 @@ const handleAnswer = (option) => {
       renderResult();
     }
   };
-
-  if (advanceTimeout) {
-    clearTimeout(advanceTimeout);
-  }
-  advanceTimeout = setTimeout(nextStep, 1600);
 };
 
 const renderResult = () => {
@@ -352,6 +341,12 @@ backBtn.addEventListener("click", () => {
   if (state.currentIndex > 0) {
     state.currentIndex -= 1;
     renderQuestion();
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  if (pendingAdvance) {
+    pendingAdvance();
   }
 });
 
