@@ -28,7 +28,7 @@ const startBtn = document.getElementById("start-btn");
 const whyBtn = document.getElementById("why-btn");
 const disclaimerBtn = document.getElementById("disclaimer-btn");
 const backBtn = document.getElementById("back-btn");
-const nextBtn = document.getElementById("next-btn");
+const nextBtn = document.getElementById("next-button");
 const resetBtn = document.getElementById("reset-btn");
 const restartBtn = document.getElementById("restart-btn");
 const shareBtn = document.getElementById("share-btn");
@@ -99,6 +99,8 @@ const clearComeback = () => {
   answerComebackEl.textContent = "";
   answerComebackEl.classList.add("hidden");
   nextBtn.disabled = true;
+  nextBtn.hidden = true;
+  nextBtn.setAttribute("aria-hidden", "true");
   pendingAdvance = null;
 };
 
@@ -107,6 +109,8 @@ const showComeback = (text) => {
   answerComebackEl.textContent = text;
   answerComebackEl.classList.remove("hidden");
   nextBtn.disabled = false;
+  nextBtn.hidden = false;
+  nextBtn.setAttribute("aria-hidden", "false");
 };
 
 const renderQuestion = () => {
@@ -124,10 +128,27 @@ const renderQuestion = () => {
   answerOptionsEl.innerHTML = "";
   question.options.forEach((option) => {
     const button = document.createElement("button");
-    button.className = "scale__btn";
+    button.className = "scale__btn answer-option";
     button.type = "button";
     button.textContent = option.label;
-    button.addEventListener("click", () => handleAnswer(option));
+    button.setAttribute("role", "radio");
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", () => {
+      const buttons = answerOptionsEl.querySelectorAll(".answer-option");
+      buttons.forEach((btn) => {
+        btn.classList.remove("selected");
+        btn.setAttribute("aria-pressed", "false");
+      });
+      button.classList.add("selected");
+      button.setAttribute("aria-pressed", "true");
+      handleAnswer(option);
+    });
+    button.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        button.click();
+      }
+    });
     answerOptionsEl.appendChild(button);
   });
 };

@@ -340,3 +340,22 @@ button:focus-visible {
     transition: none !important;
   }
 }
+
+/* -- Antwort-Auswahl: dauerhaftes Hervorheben -- */
+.answer-option {
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.answer-option:hover,
+.answer-option:focus {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.answer-option.selected {
+  background-color: rgba(30, 120, 30, 0.1);
+  border: 2px solid rgba(30, 120, 30, 0.25);
+  box-shadow: 0 4px 10px rgba(30, 120, 30, 0.05);
+}
+.answer-option:focus {
+  outline: 3px solid rgba(0, 0, 128, 0.12);
+  outline-offset: 2px;
+}
