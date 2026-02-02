@@ -4,6 +4,7 @@ const state = {
   lastFocus: null,
 };
 
+
 const startScreen = document.getElementById("start-screen");
 const questionScreen = document.getElementById("question-screen");
 const resultScreen = document.getElementById("result-screen");
@@ -15,6 +16,8 @@ const scoreValue = document.getElementById("score-value");
 const resultText = document.getElementById("result-text");
 const topFactors = document.getElementById("top-factors");
 const nextSteps = document.getElementById("next-steps");
+const answerOptionsEl = document.getElementById("answer-options");
+const answerComebackEl = document.getElementById("answer-comeback");
 
 const modal = document.getElementById("modal");
 const modalTitle = document.getElementById("modal-title");
@@ -25,13 +28,13 @@ const startBtn = document.getElementById("start-btn");
 const whyBtn = document.getElementById("why-btn");
 const disclaimerBtn = document.getElementById("disclaimer-btn");
 const backBtn = document.getElementById("back-btn");
+const nextBtn = document.getElementById("next-btn");
 const resetBtn = document.getElementById("reset-btn");
 const restartBtn = document.getElementById("restart-btn");
 const shareBtn = document.getElementById("share-btn");
 
-const scaleButtons = Array.from(document.querySelectorAll(".scale__btn"));
-
 const totalQuestions = QUESTIONS.length;
+let pendingAdvance = null;
 
 const openSection = (section) => {
   [startScreen, questionScreen, resultScreen].forEach((screen) => {
@@ -39,51 +42,52 @@ const openSection = (section) => {
   });
 };
 
-const normalizeAnswer = (value, reverse) => {
-  const normalized = value - 2;
-  return reverse ? -normalized : normalized;
-};
-
 const calcScore = () => {
   let total = 0;
-  let totalMax = 0;
-  const categoryTotals = {};
-  const categoryMax = {};
+  let minTotal = 0;
+  let maxTotal = 0;
+  const tagTotals = {};
+  const tagMax = {};
 
   QUESTIONS.forEach((question) => {
     const answer = state.answers[question.id];
     if (!answer) {
       return;
     }
-    const value = normalizeAnswer(answer, question.reverseScoring);
-    const weighted = value * question.weight;
-    total += weighted;
-    totalMax += 1 * question.weight;
+    const scores = question.options.map((option) => option.score);
+    const minScore = Math.min(...scores);
+    const maxScore = Math.max(...scores);
+    const maxAbs = Math.max(Math.abs(minScore), Math.abs(maxScore));
 
-    if (!categoryTotals[question.category]) {
-      categoryTotals[question.category] = 0;
-      categoryMax[question.category] = 0;
+    total += answer.score * question.weight;
+    minTotal += minScore * question.weight;
+    maxTotal += maxScore * question.weight;
+
+    if (!tagTotals[answer.tag]) {
+      tagTotals[answer.tag] = 0;
+      tagMax[answer.tag] = 0;
     }
-    categoryTotals[question.category] += weighted;
-    categoryMax[question.category] += 1 * question.weight;
+    tagTotals[answer.tag] += answer.score * question.weight;
+    tagMax[answer.tag] += maxAbs * question.weight;
   });
 
-  const score = Math.round(((total + totalMax) / (2 * totalMax)) * 100);
+  const score = Math.round(((total - minTotal) / (maxTotal - minTotal)) * 100);
   return {
     score: Number.isFinite(score) ? score : 0,
-    categoryTotals,
-    categoryMax,
+    tagTotals,
+    tagMax,
   };
 };
 
-const buildTopFactors = (categoryTotals, categoryMax) => {
-  const factors = Object.keys(categoryTotals).map((key) => {
-    const ratio = categoryMax[key] ? categoryTotals[key] / categoryMax[key] : 0;
+const buildTopFactors = (tagTotals, tagMax) => {
+  const factors = Object.keys(tagTotals).map((key) => {
+    const ratio = tagMax[key] ? tagTotals[key] / tagMax[key] : 0;
+    const hints = TAG_HINTS[key] || {};
     return {
       key,
       ratio,
-      label: CATEGORY_LABELS[key] || key,
-      hint: FACTOR_HINTS[key] || "",
+      label: TAG_LABELS[key] || key,
+      hint: ratio >= 0 ? hints.positive || "" : hints.negative || "",
     };
   });
 
@@ -91,37 +95,73 @@ const buildTopFactors = (categoryTotals, categoryMax) => {
   return factors.slice(0, 3);
 };
 
+const clearComeback = () => {
+  answerComebackEl.textContent = "";
+  answerComebackEl.classList.add("hidden");
+  nextBtn.disabled = true;
+  pendingAdvance = null;
+};
+
+const showComeback = (text) => {
+  clearComeback();
+  answerComebackEl.textContent = text;
+  answerComebackEl.classList.remove("hidden");
+  nextBtn.disabled = false;
+};
+
 const renderQuestion = () => {
   const question = QUESTIONS[state.currentIndex];
   if (!question) {
     return;
   }
+  clearComeback();
   questionTitle.textContent = `Frage ${state.currentIndex + 1}`;
   questionText.textContent = question.text;
   const progress = ((state.currentIndex + 1) / totalQuestions) * 100;
   progressBar.style.width = `${progress}%`;
   progressText.textContent = `Frage ${state.currentIndex + 1} von ${totalQuestions}`;
+
+  answerOptionsEl.innerHTML = "";
+  question.options.forEach((option) => {
+    const button = document.createElement("button");
+    button.className = "scale__btn";
+    button.type = "button";
+    button.textContent = option.label;
+    button.addEventListener("click", () => handleAnswer(option));
+    answerOptionsEl.appendChild(button);
+  });
 };
 
-const handleAnswer = (value) => {
+const handleAnswer = (option) => {
   const question = QUESTIONS[state.currentIndex];
-  state.answers[question.id] = Number(value);
+  state.answers[question.id] = option;
+  showComeback(option.comeback);
 
-  if (state.currentIndex < totalQuestions - 1) {
-    state.currentIndex += 1;
-    renderQuestion();
-  } else {
-    renderResult();
-  }
+  pendingAdvance = () => {
+    if (state.currentIndex < totalQuestions - 1) {
+      state.currentIndex += 1;
+      renderQuestion();
+    } else {
+      renderResult();
+    }
+  };
 };
 
 const renderResult = () => {
-  const { score, categoryTotals, categoryMax } = calcScore();
-  const result = RESULTS.find((entry) => score >= entry.min && score <= entry.max);
+  const { score, tagTotals, tagMax } = calcScore();
+  const result = RESULTS.find((entry) => score >= entry.min && score <= entry.max) || RESULTS[0];
   scoreValue.textContent = score;
   resultText.innerHTML = `
     <h3>${result.title}</h3>
     <p>${result.description}</p>
+    <div class="result__block">
+      <h4>Kurz &amp; fundiert</h4>
+      <ul class="list">${ALWAYS_REASONS.map((item) => `<li>${item}</li>`).join("")}</ul>
+    </div>
+    <div class="result__block">
+      <h4>Warum Nichtwählen schlechter ist</h4>
+      <ul class="list">${ALWAYS_WHY_NOT.map((item) => `<li>${item}</li>`).join("")}</ul>
+    </div>
   `;
 
   nextSteps.innerHTML = "";
@@ -132,11 +172,13 @@ const renderResult = () => {
   });
 
   topFactors.innerHTML = "";
-  const factors = buildTopFactors(categoryTotals, categoryMax);
+  const factors = buildTopFactors(tagTotals, tagMax);
   factors.forEach((factor) => {
     const li = document.createElement("li");
-    const direction = factor.ratio >= 0 ? "Treiber" : "Bremse";
-    li.textContent = `${factor.label}: ${direction}. ${factor.hint}`;
+    li.innerHTML = `
+      <span class="factor-title">${factor.label}</span>
+      <span class="factor-hint">${factor.hint}</span>
+    `;
     topFactors.appendChild(li);
   });
 
@@ -273,7 +315,12 @@ const openDisclaimer = () => {
 };
 
 const copyHint = async () => {
-  const text = "BRorNot2BR: 60 Sekunden Wahl-Check. Ganz ohne Daten, nur im Browser.";
+  const { tagTotals, tagMax } = calcScore();
+  const factors = buildTopFactors(tagTotals, tagMax);
+  const topTag = factors[0]?.key;
+  const tagLine = topTag && TAG_SHARE_LINES[topTag] ? ` ${TAG_SHARE_LINES[topTag]}` : "";
+  const text = `Ich geh zur BR-Wahl: dauert kurz, wirkt lang. Nichtwählen heißt Einfluss verschenken.${tagLine} Kommst du mit?`;
+
   try {
     await navigator.clipboard.writeText(text);
     shareBtn.textContent = "Hinweis kopiert!";
@@ -290,16 +337,16 @@ startBtn.addEventListener("click", () => {
   renderQuestion();
 });
 
-scaleButtons.forEach((button) => {
-  button.addEventListener("click", (event) => {
-    handleAnswer(event.currentTarget.dataset.value);
-  });
-});
-
 backBtn.addEventListener("click", () => {
   if (state.currentIndex > 0) {
     state.currentIndex -= 1;
     renderQuestion();
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  if (pendingAdvance) {
+    pendingAdvance();
   }
 });
 
