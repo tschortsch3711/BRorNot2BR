@@ -6,10 +6,10 @@ const QUESTIONS = [
     weight: 1.2,
     options: [
       {
-        label: "Mitreden statt Meckern, sonst meckere ich nur leise.",
+        label: "Ich will mitreden, sonst meckere ich nur leise.",
         score: 2,
         tag: "wirkung",
-        comeback: "Mitreden statt Nachkarten – starke Wahl. Deine Stimme hat echte Hebel.",
+        comeback: "Mitreden statt Meckern – starke Wahl. Deine Stimme hat echte Hebel.",
       },
       {
         label: "Kommt drauf an, ob es mich direkt betrifft.",
